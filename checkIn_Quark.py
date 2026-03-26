@@ -63,7 +63,7 @@ class Quark:
             "sign": self.param.get('sign'),
             "vcode": self.param.get('vcode')
         }
-        response = requests.get(url=url, params=querystring).json()
+        response = requests.get(url=url, params=querystring, timeout=30).json()
         #print(response)
         if response.get("data"):
             return response["data"]
@@ -84,7 +84,7 @@ class Quark:
             "vcode": self.param.get('vcode')
         }
         data = {"sign_cyclic": True}
-        response = requests.post(url=url, json=data, params=querystring).json()
+        response = requests.post(url=url, json=data, params=querystring, timeout=30).json()
         #print(response)
         if response.get("data"):
             return True, response["data"]["sign_daily_reward"]
@@ -100,7 +100,7 @@ class Quark:
             "moduleCode": "1f3563d38896438db994f118d4ff53cb",
             "kps": self.param.get('kps'),
         }
-        response = requests.get(url=url, params=querystring).json()
+        response = requests.get(url=url, params=querystring, timeout=30).json()
         # print(response)
         if response.get("data"):
             return response["data"]["balance"]
@@ -113,8 +113,12 @@ class Quark:
         :return: 返回一个字符串，包含签到结果
         '''
         log = ""
-        # 每日领空间
-        growth_info = self.get_growth_info()
+        try:
+            # 每日领空间
+            growth_info = self.get_growth_info()
+        except requests.exceptions.RequestException as e:
+            log += f"❌ 签到异常: 网络连接失败 ({e})\n"
+            return log
         if growth_info:
             log += (
                 f" {'88VIP' if growth_info['88VIP'] else '普通用户'} {self.param.get('user')}\n"
@@ -130,7 +134,11 @@ class Quark:
                     f"连签进度({growth_info['cap_sign']['sign_progress']}/{growth_info['cap_sign']['sign_target']})\n"
                 )
             else:
-                sign, sign_return = self.get_growth_sign()
+                try:
+                    sign, sign_return = self.get_growth_sign()
+                except requests.exceptions.RequestException as e:
+                    log += f"❌ 签到异常: 网络连接失败 ({e})\n"
+                    return log
                 if sign:
                     log += (
                         f"✅ 执行签到: 今日签到+{self.convert_bytes(sign_return)}，"
