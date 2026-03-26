@@ -117,7 +117,7 @@ class Quark:
             # 每日领空间
             growth_info = self.get_growth_info()
         except requests.exceptions.RequestException as e:
-            log += f"❌ 签到异常: 网络连接失败 ({e})\n"
+            log += f"❌ 签到异常: 网络连接失败 ({type(e).__name__})\n"
             return log
         if growth_info:
             log += (
@@ -137,7 +137,7 @@ class Quark:
                 try:
                     sign, sign_return = self.get_growth_sign()
                 except requests.exceptions.RequestException as e:
-                    log += f"❌ 签到异常: 网络连接失败 ({e})\n"
+                    log += f"❌ 签到异常: 网络连接失败 ({type(e).__name__})\n"
                     return log
                 if sign:
                     log += (
