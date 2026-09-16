@@ -3,18 +3,17 @@ import re
 import sys 
 import requests 
 
-cookie_list = os.getenv("COOKIE_QUARK").split('\n|&&')
-
 # 替代 notify 功能
 def send(title, message):
     print(f"{title}: {message}")
 
 # 获取环境变量 
 def get_env(): 
+    cookie_quark = os.getenv('COOKIE_QUARK')
     # 判断 COOKIE_QUARK是否存在于环境变量 
-    if "COOKIE_QUARK" in os.environ: 
+    if cookie_quark: 
         # 读取系统变量以 \n 或 && 分割变量 
-        cookie_list = re.split('\n|&&', os.environ.get('COOKIE_QUARK')) 
+        cookie_list = re.split('\n|&&', cookie_quark) 
     else: 
         # 标准日志输出 
         print('❌未添加COOKIE_QUARK变量') 
